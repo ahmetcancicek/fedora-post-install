@@ -134,11 +134,11 @@ for choice in $choices; do
   D3)
     wget https://golang.org/dl/go1.17.1.linux-amd64.tar.gz
     rm -rf /usr/local/go && tar -C /usr/local -xzf go1.17.1.linux-amd64.tar.gz
-    echo ' ' >> $HOME/.profile
-    echo '# GoLang configuration ' >> $HOME/.profile
-    echo 'export PATH="$PATH:/usr/local/go/bin"' >> $HOME/.profile
-    echo 'export GOPATH="$HOME/go"' >> $HOME/.profile
-    source $HOME/.profile
+    echo ' ' >> $HOME/.bashrc
+    echo '# GoLang configuration ' >> $HOME/.bashrc
+    echo 'export PATH="$PATH:/usr/local/go/bin"' >> $HOME/.bashrc
+    echo 'export GOPATH="$HOME/go"' >> $HOME/.bashrc
+    source $HOME/.bashrc
     ;;
   D4)
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
@@ -163,12 +163,12 @@ for choice in $choices; do
     tar -zxvf apache-maven-3.6.3-bin.tar.gz
     mkdir /opt/maven
     mv ./apache-maven-3.6.3 /opt/maven/
-    echo ' ' >> $HOME/.profile
-    echo '# Maven Configuration' >> $HOME/.profile
-    echo 'JAVA_HOME=/usr/lib/jvm/default-java' >> $HOME/.profile
-    echo 'export M2_HOME=/opt/maven/apache-maven-3.6.3' >> $HOME/.profile
-    echo 'export PATH=${M2_HOME}/bin:${PATH}' >> $HOME/.profile
-    source $HOME/.profile
+    echo ' ' >> $HOME/.bashrc
+    echo '# Maven Configuration' >> $HOME/.bashrc
+    echo 'JAVA_HOME=/usr/lib/jvm/default-java' >> $HOME/.bashrc
+    echo 'export M2_HOME=/opt/maven/apache-maven-3.6.3' >> $HOME/.bashrc
+    echo 'export PATH=${M2_HOME}/bin:${PATH}' >> $HOME/.bashrc
+    source $HOME/.bashrc
     ;;
   D10)
     dnf -y install putty
