@@ -129,7 +129,7 @@ for choice in $choices; do
     dnf -y install git
     ;;
   D2)
-    dnf -y install default-jdk
+    dnf -y install java-latest-openjdk.x86_64
     ;;
   D3)
     wget https://golang.org/dl/go1.17.1.linux-amd64.tar.gz
