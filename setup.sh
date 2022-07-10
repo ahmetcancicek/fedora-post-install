@@ -60,8 +60,9 @@ dnf install -y \
   dialog
 printf "\n${BLUE}===============Standard packages are installed successfully===============${ENDCOLOR}\n"
 
-sudo dnf install gnome-extensions-app
-sudo dnf install gnome-shell-extension-dash-to-dock
+sudo dnf install -y gnome-extensions-app
+sudo dnf install -y gnome-tweak-tool
+sudo dnf install -y gnome-shell-extension-dash-to-dock
 
 cmd=(dialog --title "Fedora 35 Installer" --separate-output --checklist 'Please choose: ' 27 76 16)
 options=(
@@ -131,7 +132,7 @@ for choice in $choices; do
   B1)
     writeInstallationMessage Google-Chrome
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
-    dnf -y install ./google-chrome-stable_current_x86_64.rpm
+    dnf install -y ./google-chrome-stable_current_x86_64.rpm
     writeInstallationSuccessfulMessage Google-Chrome
     ;;
   B2)
@@ -296,7 +297,7 @@ for choice in $choices; do
     echo ' ' >>/etc/profile.d/maven.sh
     echo '# Maven Configuration' >>/etc/profile.d/maven.sh
     echo 'JAVA_HOME=/usr/lib/jvm/default-java' >>/etc/profile.d/maven.sh
-    echo 'export M2_HOME=/opt/maven/apache-maven-3.6.3' >>/etc/profile.d/maven.sh
+    echo 'export M2_HOME=/opt/maven' >>/etc/profile.d/maven.sh
     echo 'export PATH=${M2_HOME}/bin:${PATH}' >>/etc/profile.d/maven.sh
     source /etc/profile.d/maven.sh
     cd /tmp
@@ -334,7 +335,7 @@ for choice in $choices; do
 
   F1)
     wget -O dropbox.rpm https://www.dropbox.com/download?dl=packages/fedora/nautilus-dropbox-2020.03.04-1.fedora.x86_64.rpm
-    dnf -y install ./dropbox.rpm
+    dnf install -y ./dropbox.rpm
     ;;
   F2)
     dnf install -y keepassxc
