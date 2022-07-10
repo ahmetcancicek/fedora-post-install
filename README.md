@@ -1,6 +1,6 @@
 # Fedora Post Install
 
-Bash script in this repository can help you to install many programs quickly. Although the script is simple, after installing the operations system, you might save your time due to using it.
+Bash scripts in this repository can help you to install many programs quickly. Although the script is simple, after installing the operations system, you might save your time due to using it.
 
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 
@@ -9,27 +9,16 @@ Bash script in this repository can help you to install many programs quickly. Al
 Install dependencies
 
 ```bash
-sudo dnf -y install git || dnf -y install make
+sudo dnf -y install \
+curl
 ```
 
 ## Run
 
-Clone the project
+You can use below code.
 
 ```bash
-  git clone https://github.com/ahmetcancicek/fedora-post-install.git
-```
-
-Go to the project directory
-
-```bash
-  cd fedora-post-install
-```
-
-Run
-
-```bash
-    sudo make run
+sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/ahmetcancicek/fedora-post-install/main/setup.sh)" 
 ```
 
 ## License
