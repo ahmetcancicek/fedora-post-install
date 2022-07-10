@@ -6,6 +6,29 @@ if [ "$(id -u)" != 0 ]; then
   exit 1
 fi
 
+writeInstallationMessage() {
+  printf "\n${BLUE}===============================Installing $1==============================${ENDCOLOR}\n"
+}
+
+writeInstallationSuccessfulMessage() {
+  printf "${GREEN}========================$1 is installed successfully!========================${ENDCOLOR}\n"
+}
+
+# Set Color
+RED="\e[31m"
+GREEN="\e[32m"
+BLUE="\e[34m"
+ENDCOLOR="\e[0m"
+
+# Set Version
+JETBRAINS_VERSION=2022.1.3
+GO_VERSION=1.18.3
+POSTMAN_VERSION=9.20.3
+MAVEN=3
+MAVEN_VERSION=3.8.6
+DROIDCAM_VERSION=1.8.1
+DROPBOX_VERSION=2020.03.04
+
 # Get USER name
 USER=$(logname)
 
@@ -16,28 +39,38 @@ HOME=/home/$USER
 cd /tmp
 
 # Update
+printf "\n${BLUE}========================Installing Updating========================${ENDCOLOR}\n"
 dnf -y update
+printf "${GREEN}========================Updated successfully!========================${ENDCOLOR}\n"
 
 # Upgrade
+printf "\n${BLUE}========================Upgrading========================${ENDCOLOR}\n"
 dnf -y upgrade
+printf "${GREEN}========================Upgared successfully!========================${ENDCOLOR}\n"
 
 # Install standard package
+printf "\n${BLUE}========================Installing standard package $1========================${ENDCOLOR}\n"
 dnf install -y \
   ca-certificates \
   curl \
-  gnupg \
-  lsb-release \
   wget \
+  dialog \
+  tree \
+  zsh \
   dialog
+printf "\n${BLUE}===============Standard packages are installed successfully===============${ENDCOLOR}\n"
+
+sudo dnf install gnome-extensions-app
+sudo dnf install gnome-shell-extension-dash-to-dock
 
 cmd=(dialog --title "Fedora 35 Installer" --separate-output --checklist 'Please choose: ' 27 76 16)
 options=(
-  A1 "Install Snap Repository" on
-  A2 "Install Flatpak Repository" on
+  A1 "Install Snap Repository" off
+  A2 "Install Flatpak Repository" off
   # B: Internet
   B1 "Google Chrome" off
   B2 "Chromium" off
-  B3 "Spotify (Snap)" off
+  B3 "Spotify" off
   B4 "Opera" off
   # C: Chat Application
   C1 "Zoom Meeting Client" off
@@ -48,12 +81,12 @@ options=(
   C6 "Microsoft Teams (Snap)" off
   # D: Development
   D1 "GIT" off
-  D2 "JAVA" off
+  D2 "JAVA" offf
   D3 "GO" off
   D4 "Microsoft Visual Studio Code" off
-  D5 "IntelliJ IDEA Ultimate (Snap)" off
-  D6 "GoLand (Snap)" off
-  D7 "Postman (Snap)" off
+  D5 "IntelliJ IDEA Ultimate" off
+  D6 "GoLand" off
+  D7 "Postman" off
   D8 "Docker" off
   D9 "Maven" off
   D10 "Putty" off
@@ -78,119 +111,196 @@ options=(
   G2 "Droidcam" off
 )
 
-choices=$("${cmd[@]}" "${options[@]}" 2>&1 > /dev/tty)
+choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
 clear
 for choice in $choices; do
   case $choice in
   A1)
+    writeInstallationMessage Snap-Repository
     dnf -y install snapd
     snap install snap-store
+    writeInstallationSuccessfulMessage Snap-Repository
     ;;
   A2)
+    writeInstallationMessage Flatpak-Repository
     flatpak remote-add --if-not-exists fedora oci+https://registry.fedoraproject.org
     flatpak remote-ls flathub --app
+    writeInstallationSuccessfulMessage Flatpak-Repository
     ;;
 
   B1)
+    writeInstallationMessage Google-Chrome
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
     dnf -y install ./google-chrome-stable_current_x86_64.rpm
+    writeInstallationSuccessfulMessage Google-Chrome
     ;;
   B2)
     dnf -y install chromium
     ;;
   B3)
-    snap install spotify
+    writeInstallationMessage Spotify
+    # TODO:
+    writeInstallationSuccessfulMessage Spotify
     ;;
   B4)
+    writeInstallationMessage Opera
     snap install opera
+    writeInstallationSuccessfulMessage Opera
     ;;
 
   C1)
+    writeInstallationMessage Zoom
     wget https://zoom.us/client/latest/zoom_x86_64.rpm
-    dnf -y install ./zoom_x86_64.deb
+    dnf -y install ./zoom_x86_64.rpm
+    writeInstallationSuccessfulMessage Zoom
     ;;
   C2)
-    snap install discord
+    writeInstallationMessage Discord
+    # TODO:
+    writeInstallationSuccessfulMessage Discord
     ;;
   C3)
-     dnf -y install thunderbird
-     ;;
+    writeInstallationMessage Thunderbird
+    dnf -y install thunderbird
+    writeInstallationSuccessfulMessage Thunderbird
+    ;;
   C4)
+    writeInstallationMessage Skype
     snap install skype
+    writeInstallationSuccessfulMessage Skype
     ;;
   C5)
+    writeInstallationMessage Slack
     snap install slack --classic
+    writeInstallationSuccessfulMessage Slack
     ;;
   C6)
+    writeInstallationMessage Teams
     snap install teams
+    writeInstallationSuccessfulMessage Teams
     ;;
 
   D1)
+    writeInstallationMessage GIT
     dnf -y install git
+    writeInstallationSuccessfulMessage GIT
     ;;
   D2)
+    writeInstallationMessage OpenJDK
     dnf -y install java-latest-openjdk.x86_64
+    writeInstallationMessage OpenJDK
     ;;
   D3)
-    wget https://golang.org/dl/go1.17.1.linux-amd64.tar.gz
-    rm -rf /usr/local/go && tar -C /usr/local -xzf go1.17.1.linux-amd64.tar.gz
-    echo ' ' >> $HOME/.bashrc
-    echo '# GoLang configuration ' >> $HOME/.bashrc
-    echo 'export PATH="$PATH:/usr/local/go/bin"' >> $HOME/.bashrc
-    echo 'export GOPATH="$HOME/go"' >> $HOME/.bashrc
-    source $HOME/.bashrc
+    writeInstallationMessage Go
+    wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+    rm -rf /usr/local/go && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+    echo ' ' >>$HOME/.bash_profile
+    echo '# GoLang configuration ' >>$HOME/.bash_profile
+    echo 'export PATH="$PATH:/usr/local/go/bin"' >>$HOME/.bash_profile
+    echo 'export GOPATH="$HOME/go"' >>$HOME/.bash_profile
+    source $HOME/.bash_profile
+    writeInstallationSuccessfulMessage Go
     ;;
   D4)
+    writeInstallationMessage vscode
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
-    sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo'    sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'    rm -f packages.microsoft.gpg
+    sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo' sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list' rm -f packages.microsoft.gpg
     dnf check-update
     dnf install code
+    writeInstallationSuccessfulMessage vscode
     ;;
   D5)
-    snap install intellij-idea-ultimate --classic
+    writeInstallationMessage IntelliJ-IDEA
+    wget https://download.jetbrains.com/idea/ideaIU-${JETBRAINS_VERSION}.tar.gz -O ideaIU.tar.gz
+    tar -xzf ideaIU.tar.gz -C /opt
+    mv /opt/idea-IU-* /opt/idea-IU-${JETBRAINS_VERSION}
+    ln -s /opt/idea-IU-${JETBRAINS_VERSION}/bin/idea.sh /usr/local/bin/idea
+    echo "[Desktop Entry]
+          Version=1.0
+          Type=Application
+          Name=IntelliJ IDEA Ultimate Edition
+          Icon=/opt/idea-IU-${JETBRAINS_VERSION}/bin/idea.svg
+          Exec=/opt/idea-IU-${JETBRAINS_VERSION}/bin/idea.sh %f
+          Comment=Capable and Ergonomic IDE for JVM
+          Categories=Development;IDE;
+          Terminal=false
+          StartupWMClass=jetbrains-idea
+          StartupNotify=true;" >>/usr/share/applications/jetbrains-idea.desktop
+    writeInstallationSuccessfulMessage IntelliJ-IDEA
     ;;
   D6)
-    sudo snap install goland --classic
+    writeInstallationMessage GoLand
+    wget https://download.jetbrains.com/go/goland-${JETBRAINS_VERSION}.tar.gz -O goland.tar.gz
+    tar -xzf goland.tar.gz -C /opt
+    ln -s /opt/GoLand-${JETBRAINS_VERSION}/bin/goland.sh /usr/local/bin/goland
+    echo "[Desktop Entry]
+          Version=1.0
+          Type=Application
+          Name=GoLand
+          Icon=/opt/GoLand-${JETBRAINS_VERSION}/bin/goland.png
+          Exec=/opt/GoLand-${JETBRAINS_VERSION}/bin/goland.sh
+          Terminal=false
+          Categories=Development;IDE;" >>/usr/share/applications/jetbrains-goland.desktop
+    writeInstallationSuccessfulMessage GoLand
     ;;
   D7)
-    snap install postman
+    writeInstallationMessage Postman
+    curl https://dl.pstmn.io/download/latest/linux64 --output postman-${POSTMAN_VERSION}-linux-x64.tar.gz
+    tar -xzf postman-${POSTMAN_VERSION}-linux-x64.tar.gz -C /opt
+    echo "[Desktop Entry]
+          Encoding=UTF-8
+          Name=Postman
+          Exec=/opt/Postman/app/Postman %U
+          Icon=/opt/Postman/app/resources/app/assets/icon.png
+          Terminal=false
+          Type=Application
+          Categories=Development;" >>/usr/share/applications/Postman.desktop
+    writeInstallationSuccessfulMessage Postman
     ;;
   D8)
+    writeInstallationMessage Docker
     dnf remove docker \
-                  docker-client \
-                  docker-client-latest \
-                  docker-common \
-                  docker-latest \
-                  docker-latest-logrotate \
-                  docker-logrotate \
-                  docker-selinux \
-                  docker-engine-selinux \
-                  docker-engine
+      docker-client \
+      docker-client-latest \
+      docker-common \
+      docker-latest \
+      docker-latest-logrotate \
+      docker-logrotate \
+      docker-selinux \
+      docker-engine-selinux \
+      docker-engine
 
     dnf -y install dnf-plugins-core
     dnf config-manager \
-    --add-repo \
-    https://download.docker.com/linux/fedora/docker-ce.repo
+      --add-repo \
+      https://download.docker.com/linux/fedora/docker-ce.repo
 
     dnf install docker-ce docker-ce-cli containerd.io
     systemctl start docker
     docker run hello-world
+    writeInstallationSuccessfulMessage docker-compose
 
+    writeInstallationMessage docker-compose
     curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     chmod +x /usr/local/bin/docker-compose
     docker-compose --version
+    writeInstallationSuccessfulMessage docker-compose
     ;;
   D9)
-    wget https://dlcdn.apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz
-    tar -zxvf apache-maven-3.6.3-bin.tar.gz
-    mkdir /opt/maven
-    mv ./apache-maven-3.6.3 /opt/maven/
-    echo ' ' >> $HOME/.bashrc
-    echo '# Maven Configuration' >> $HOME/.bashrc
-    echo 'JAVA_HOME=/usr/lib/jvm/default-java' >> $HOME/.bashrc
-    echo 'export M2_HOME=/opt/maven/apache-maven-3.6.3' >> $HOME/.bashrc
-    echo 'export PATH=${M2_HOME}/bin:${PATH}' >> $HOME/.bashrc
-    source $HOME/.bashrc
+    writeInstallationMessage Maven
+    wget https://dlcdn.apache.org/maven/maven-${MAVEN}/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
+    tar -zxvf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /opt
+    cd /opt
+    ln -s apache-maven-${MAVEN_VERSION} maven
+    touch /etc/profile.d/maven.sh
+    echo ' ' >>/etc/profile.d/maven.sh
+    echo '# Maven Configuration' >>/etc/profile.d/maven.sh
+    echo 'JAVA_HOME=/usr/lib/jvm/default-java' >>/etc/profile.d/maven.sh
+    echo 'export M2_HOME=/opt/maven/apache-maven-3.6.3' >>/etc/profile.d/maven.sh
+    echo 'export PATH=${M2_HOME}/bin:${PATH}' >>/etc/profile.d/maven.sh
+    source /etc/profile.d/maven.sh
+    cd /tmp
+    writeInstallationSuccessfulMessage Maven
     ;;
   D10)
     dnf -y install putty
@@ -216,10 +326,10 @@ for choice in $choices; do
     ;;
 
   E1)
-    dnf -y install gnome-tweak-tool
+    # TODO:
     ;;
   E2)
-    dnf -y install gnome-shell-extensions
+    # TODO:
     ;;
 
   F1)
@@ -227,7 +337,7 @@ for choice in $choices; do
     dnf -y install ./dropbox.rpm
     ;;
   F2)
-    snap install keepassxc
+    dnf install -y keepassxc
     ;;
   F3)
     # TODO: Write command to install the VirtualBox
@@ -255,15 +365,16 @@ for choice in $choices; do
     wget -O droidcam_latest.zip https://files.dev47apps.net/linux/droidcam_1.8.1.zip
     unzip droidcam_latest.zip -d droidcam
     cd droidcam && ./install-client
-    dnf -y install linux-headers-`uname -r` gcc make
+    dnf -y install linux-headers-$(uname -r) gcc make
     ./install-video
 
     dnf -y install libappindicator-gtk3
     ;;
-  *)
+
+  \
+    *) ;;
   esac
 done
-
 
 cat <<EOL
 ---------------------------------------------------------------
@@ -276,10 +387,9 @@ cat <<EOL
 EOL
 
 read -p "Are you going to reboot this machine for stability? (y/n): " -n 1 answer
-if [[ $answer =~ ^[Yy]$ ]];then
+if [[ $answer =~ ^[Yy]$ ]]; then
   reboot
 fi
-
 
 cat <<EOL
 
