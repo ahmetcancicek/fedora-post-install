@@ -60,9 +60,6 @@ dnf install -y \
   dialog
 printf "\n${BLUE}===============Standard packages are installed successfully===============${ENDCOLOR}\n"
 
-sudo dnf install -y gnome-extensions-app
-sudo dnf install -y gnome-tweak-tool
-sudo dnf install -y gnome-shell-extension-dash-to-dock
 
 cmd=(dialog --title "Fedora 35 Installer" --separate-output --checklist 'Please choose: ' 27 76 16)
 options=(
@@ -71,8 +68,9 @@ options=(
   # B: Internet
   B1 "Google Chrome" off
   B2 "Chromium" off
-  B3 "Spotify" off
-  B4 "Opera" off
+  B3 "Spotify (Snap)" off
+  B4 "Opera (Snap)" off
+  B5 "Microsoft Edge" off
   # C: Chat Application
   C1 "Zoom Meeting Client" off
   C2 "Discord" off
@@ -124,7 +122,7 @@ for choice in $choices; do
     ;;
   A2)
     writeInstallationMessage Flatpak-Repository
-    # TODO:
+    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
     writeInstallationSuccessfulMessage Flatpak-Repository
     ;;
 
@@ -135,17 +133,25 @@ for choice in $choices; do
     writeInstallationSuccessfulMessage Google-Chrome
     ;;
   B2)
+    writeInstallationMessage Chromium
     dnf -y install chromium
+    writeInstallationSuccessfulMessage Chromium
     ;;
   B3)
     writeInstallationMessage Spotify
-    # TODO:
+    snap install spotify
     writeInstallationSuccessfulMessage Spotify
     ;;
   B4)
     writeInstallationMessage Opera
     snap install opera
     writeInstallationSuccessfulMessage Opera
+    ;;
+  B5)
+    writeInstallationMessage Microsoft-Edge
+    wget -O edge.tar.gz https://packages.microsoft.com/yumrepos/edge/microsoft-edge-stable-103.0.1264.51-1.x86_64.rpm
+    dnf -y install microsoft-edge-stable-103.0.1264.51-1.x86_64.rpm
+    writeInstallationSuccessfulMessage Microsoft-Edge
     ;;
 
   C1)
@@ -317,7 +323,19 @@ for choice in $choices; do
     snap install robo3t-snap
     ;;
   D14)
-    snap install datagrip --classic
+    writeInstallationMessage DataGrip
+    wget https://download.jetbrains.com/datagrip/datagrip-${JETBRAINS_VERSION}.tar.gz
+    tar -xzf datagrip-${JETBRAINS_VERSION}.tar.gz -C /opt
+    ln -s /opt/DataGrip-${JETBRAINS_VERSION}/bin/datagrip.sh /usr/local/bin/datagrip
+    echo "[Desktop Entry]
+          Version=1.0
+          Type=Application
+          Name=DataGrip
+          Icon=/opt/DataGrip-${JETBRAINS_VERSION}/bin/datagrip.png
+          Exec=/opt/DataGrip-${JETBRAINS_VERSION}/bin/datagrip.sh
+          Terminal=false
+          Categories=Development;IDE;" >> /usr/share/applications/jetbrains-datagrip.desktop
+    writeInstallationSuccessfulMessage DataGrip
     ;;
   D15)
     wget -O mongosh.rpm https://downloads.mongodb.com/compass/mongodb-mongosh-1.2.2.el8.x86_64.rpm
@@ -328,10 +346,10 @@ for choice in $choices; do
     ;;
 
   E1)
-    # TODO:
+    dnf install -y gnome-tweak-tool
     ;;
   E2)
-    # TODO:
+    dnf install -y gnome-extensions-app
     ;;
 
   F1)
