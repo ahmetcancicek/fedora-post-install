@@ -124,8 +124,7 @@ for choice in $choices; do
     ;;
   A2)
     writeInstallationMessage Flatpak-Repository
-    flatpak remote-add --if-not-exists fedora oci+https://registry.fedoraproject.org
-    flatpak remote-ls flathub --app
+    # TODO:
     writeInstallationSuccessfulMessage Flatpak-Repository
     ;;
 
@@ -195,11 +194,13 @@ for choice in $choices; do
     writeInstallationMessage Go
     wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
     rm -rf /usr/local/go && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
-    echo ' ' >>$HOME/.bash_profile
-    echo '# GoLang configuration ' >>$HOME/.bash_profile
-    echo 'export PATH="$PATH:/usr/local/go/bin"' >>$HOME/.bash_profile
-    echo 'export GOPATH="$HOME/go"' >>$HOME/.bash_profile
-    source $HOME/.bash_profile
+    touch /etc/profile.d/goenv.sh
+    echo ' ' >> /etc/profile.d/goenv.sh
+    echo '# GoLang configuration ' >> /etc/profile.d/goenv.sh
+    echo 'export PATH="$PATH:/usr/local/go/bin"' >> /etc/profile.d/goenv.sh
+    echo 'export GOPATH="$HOME/go"' >> /etc/profile.d/goenv.sh
+    source /etc/profile.d/goenv.sh
+    cd /tmp
     writeInstallationSuccessfulMessage Go
     ;;
   D4)
@@ -207,7 +208,7 @@ for choice in $choices; do
     rpm --import https://packages.microsoft.com/keys/microsoft.asc
     sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo' sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list' rm -f packages.microsoft.gpg
     dnf check-update
-    dnf install code
+    dnf -y install code
     writeInstallationSuccessfulMessage vscode
     ;;
   D5)
@@ -276,10 +277,10 @@ for choice in $choices; do
       --add-repo \
       https://download.docker.com/linux/fedora/docker-ce.repo
 
-    dnf install docker-ce docker-ce-cli containerd.io
+    dnf -y install docker-ce docker-ce-cli containerd.io
     systemctl start docker
     docker run hello-world
-    writeInstallationSuccessfulMessage docker-compose
+    writeInstallationSuccessfulMessage Docker
 
     writeInstallationMessage docker-compose
     curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -368,7 +369,6 @@ for choice in $choices; do
     cd droidcam && ./install-client
     dnf -y install linux-headers-$(uname -r) gcc make
     ./install-video
-
     dnf -y install libappindicator-gtk3
     ;;
 
