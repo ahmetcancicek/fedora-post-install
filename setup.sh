@@ -105,6 +105,7 @@ options=(
   F5 "Powerline" off
   F6 "Htop" off
   F7 "vimrc" off
+  F8 "Ulauncher" off
   # G: Image, Video and Audio
   G1 "GIMP" off
   G2 "Droidcam" off
@@ -375,6 +376,9 @@ for choice in $choices; do
   F7)
     git clone --depth=1 https://github.com/amix/vimrc.git ~/.vim_runtime
     sh ~/.vim_runtime/install_awesome_vimrc.sh
+    ;;
+  F8)
+    dnf install ulauncher
     ;;
 
   G1)
