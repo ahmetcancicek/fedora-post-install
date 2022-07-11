@@ -9,8 +9,7 @@ Bash scripts in this repository can help you to install many programs quickly. A
 Install dependencies
 
 ```bash
-sudo dnf -y install \
-curl
+sudo dnf -y install curl
 ```
 
 ## Run
