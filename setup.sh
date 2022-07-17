@@ -57,9 +57,9 @@ dnf install -y \
   dialog \
   tree \
   zsh \
-  dialog
+  dialog \
+  gnome-font-viewer
 printf "\n${BLUE}===============Standard packages are installed successfully===============${ENDCOLOR}\n"
-
 
 cmd=(dialog --title "Fedora 35 Installer" --separate-output --checklist 'Please choose: ' 27 76 16)
 options=(
@@ -69,14 +69,14 @@ options=(
   B1 "Google Chrome" off
   B2 "Chromium" off
   B3 "Spotify (Snap)" off
-  B4 "Opera (Snap)" off
+  B4 "Opera" off
   B5 "Microsoft Edge" off
   # C: Chat Application
   C1 "Zoom Meeting Client" off
   C2 "Discord" off
   C3 "Thunderbird Mail" off
   C4 "Skype (Snap)" off
-  C5 "Slack" off
+  C5 "Slack (Snap)" off
   C6 "Microsoft Teams (Snap)" off
   # D: Development
   D1 "GIT" off
@@ -145,7 +145,10 @@ for choice in $choices; do
     ;;
   B4)
     writeInstallationMessage Opera
-    snap install opera
+    dnf config-manager --add-repo https://rpm.opera.com/rpm
+    rpm --import https://rpm.opera.com/rpmrepo.key
+    dnf upgrade --refresh
+    dnf install -y opera-stable
     writeInstallationSuccessfulMessage Opera
     ;;
   B5)
@@ -163,7 +166,7 @@ for choice in $choices; do
     ;;
   C2)
     writeInstallationMessage Discord
-    # TODO:
+    snap install discord
     writeInstallationSuccessfulMessage Discord
     ;;
   C3)
@@ -193,19 +196,51 @@ for choice in $choices; do
     writeInstallationSuccessfulMessage GIT
     ;;
   D2)
-    writeInstallationMessage OpenJDK
-    dnf -y install java-latest-openjdk.x86_64
-    writeInstallationMessage OpenJDK
+    writeInstallationMessage JAVA-JDK-18
+    wget https://download.oracle.com/java/18/latest/jdk-18_linux-x64_bin.tar.gz
+    tar xf jdk-18_linux-x64_bin.tar.gz -C /usr/local/java/
+
+    update-alternatives --install "/usr/bin/java" "java" "/usr/local/java/jdk-18.0.1.1/bin/java" 1
+    update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/java/jdk-18.0.1.1/bin/javac" 1
+
+    update-alternatives --set java /usr/local/java/jdk-18.0.1.1/bin/java
+    update-alternatives --set javac /usr/local/java/jdk-18.0.1.1/bin/javac
+
+    touch /etc/profile.d/javaenv.sh
+    echo ' ' >>/etc/profile.d/javaenv.sh
+    echo 'export JAVA_HOME=/opt/jdk-18.0.1.1' >>/etc/profile.d/javaenv.sh
+    echo 'export PATH=$PATH:$HOME/bin:$JAVA_HOME/bin' >> /etc/profile.d/javaenv.sh
+    source /etc/profile.d/javaenv.sh
+    writeInstallationSuccessfulMessage JAVA-JDK-18
+
+    writeInstallationMessage JAVA-JDK-17
+    wget https://download.oracle.com/java/17/archive/jdk-17_linux-x64_bin.tar.gz
+    tar xf jdk-17_linux-x64_bin.tar.gz -C /usr/local/java
+
+    update-alternatives --install "/usr/bin/java" "java" "/usr/local/java/jdk-17/bin/java" 2
+    update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/java/jdk-17/bin/javac" 2
+    writeInstallationSuccessfulMessage JAVA-JDK-17
+
+
+    writeInstallationMessage Spring-Boot-CLI
+    wget https://repo.spring.io/release/org/springframework/boot/spring-boot-cli/2.7.1/spring-boot-cli-2.7.1-bin.tar.gz
+    tar xf spring-boot-cli-2.7.1-bin.tar.gz -C /opt
+    touch /etc/profile.d/springenv.env
+    echo ' ' >> /etc/profile.d/springenv.sh
+    echo 'export SPRING_HOME=/opt/spring-2.7.1/' >> /etc/profile.d/springenv.sh
+    echo 'export PATH=$PATH:$HOME/bin:$SPRING_HOME/bin' >> /etc/profile.d/springenv.sh
+    source /etc/profile.d/springenv.sh
+    writeInstallationSuccessfulMessage Spring-Boot-CLI
     ;;
   D3)
     writeInstallationMessage Go
     wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
     rm -rf /usr/local/go && tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
     touch /etc/profile.d/goenv.sh
-    echo ' ' >> /etc/profile.d/goenv.sh
-    echo '# GoLang configuration ' >> /etc/profile.d/goenv.sh
-    echo 'export PATH="$PATH:/usr/local/go/bin"' >> /etc/profile.d/goenv.sh
-    echo 'export GOPATH="$HOME/go"' >> /etc/profile.d/goenv.sh
+    echo ' ' >>/etc/profile.d/goenv.sh
+    echo '# GoLang configuration ' >>/etc/profile.d/goenv.sh
+    echo 'export PATH="$PATH:/usr/local/go/bin"' >>/etc/profile.d/goenv.sh
+    echo 'export GOPATH="$HOME/go"' >>/etc/profile.d/goenv.sh
     source /etc/profile.d/goenv.sh
     cd /tmp
     writeInstallationSuccessfulMessage Go
@@ -287,6 +322,8 @@ for choice in $choices; do
     dnf -y install docker-ce docker-ce-cli containerd.io
     systemctl start docker
     docker run hello-world
+    groupadd docker
+    usermod -a -G docker $USER 
     writeInstallationSuccessfulMessage Docker
 
     writeInstallationMessage docker-compose
@@ -335,7 +372,7 @@ for choice in $choices; do
           Icon=/opt/DataGrip-${JETBRAINS_VERSION}/bin/datagrip.png
           Exec=/opt/DataGrip-${JETBRAINS_VERSION}/bin/datagrip.sh
           Terminal=false
-          Categories=Development;IDE;" >> /usr/share/applications/jetbrains-datagrip.desktop
+          Categories=Development;IDE;" >>/usr/share/applications/jetbrains-datagrip.desktop
     writeInstallationSuccessfulMessage DataGrip
     ;;
   D15)
@@ -351,6 +388,7 @@ for choice in $choices; do
     ;;
   E2)
     dnf install -y gnome-extensions-app
+    dnf install -y gnome-shell-extension-appindicator
     ;;
 
   F1)
@@ -367,8 +405,8 @@ for choice in $choices; do
     dnf -y install terminator
     ;;
   F5)
-    dnf -y instal powerline fonts-powerline
     # TODO: Fix configuration
+    dnf -y instal powerline fonts-powerline
     ;;
   F6)
     dnf -y install htop
@@ -394,8 +432,7 @@ for choice in $choices; do
     dnf -y install libappindicator-gtk3
     ;;
 
-  \
-    *) ;;
+  *)
   esac
 done
 
