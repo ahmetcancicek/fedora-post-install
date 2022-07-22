@@ -88,7 +88,7 @@ options=(
   C6 "Microsoft Teams (Snap)" off
   # D: Development
   D1 "GIT" off
-  D2 "JAVA" offf
+  D2 "JAVA" off
   D3 "GO" off
   D4 "Microsoft Visual Studio Code" off
   D5 "IntelliJ IDEA Ultimate" off
@@ -368,11 +368,15 @@ for choice in $choices; do
     writeInstallationSuccessfulMessage DataGrip
     ;;
   D14)
+    writeInstallationMessage Mongo-Shell
     wget -O mongosh.rpm https://downloads.mongodb.com/compass/mongodb-mongosh-1.2.2.el8.x86_64.rpm
     dpkg -i ./mongosh.rpm
+    writeInstallationSuccessfulMessage Mongo-Shell
 
+    writeInstallationMessage MongoDB-Database-Tools
     wget -O mongodb-database-tools.rpm https://fastdl.mongodb.org/tools/db/mongodb-database-tools-rhel80-x86_64-100.5.2.rpm
     dpkg -i ./mongodb-database-tools.rpm
+    writeInstallationSuccessfulMessage MongoDB-Database-Tools
     ;;
 
   E1)
