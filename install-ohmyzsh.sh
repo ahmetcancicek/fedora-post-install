@@ -1,15 +1,28 @@
 #!/bin/bash
 
+# Set Color
+RED="\e[31m"
+GREEN="\e[32m"
+BLUE="\e[34m"
+ENDCOLOR="\e[0m"
+
 # For root control
 if [ "$(id -u)" != 0 ]; then
-  echo "You are not root! This script must be run as root"
+  printf "${RED}"
+  cat <<EOL
+========================================================================
+You are not root! This script must be run as root!
+========================================================================
+EOL
+  printf "${ENDCOLOR}"
   exit 1
 fi
 
+
 cat <<EOL
----------------------------------------------------------------
+========================================================================
 Oh My Zsh is installing!
----------------------------------------------------------------
+========================================================================
 EOL
 
 # Get USER name
@@ -26,11 +39,13 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 source .zshrc
 
 
+printf "${GREEN}"
 cat <<EOL
----------------------------------------------------------------
+========================================================================
 Congratulations, everything you wanted to install is installed!
----------------------------------------------------------------
+========================================================================
 EOL
+printf "${ENDCOLOR}"
 
 cat <<EOL
 
