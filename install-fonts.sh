@@ -26,6 +26,9 @@ Fonts is installing!
 EOL
 printf "${ENDCOLOR}"
 
+# Go TEMP folder
+cd /tmp
+
 #
 dnf install -y powerline-fonts
 
