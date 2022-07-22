@@ -18,12 +18,13 @@ EOL
   exit 1
 fi
 
-
+printf "${BLUE}"
 cat <<EOL
 ========================================================================
 Oh My Zsh is installing!
 ========================================================================
 EOL
+printf "${ENDCOLOR}"
 
 # Get USER name
 USER=$(logname)
