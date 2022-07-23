@@ -202,14 +202,16 @@ for choice in $choices; do
     ;;
   D2)
     writeInstallationMessage JAVA-JDK-18
-    wget https://download.oracle.com/java/18/latest/jdk-18_linux-x64_bin.tar.gz
-    tar xf jdk-18_linux-x64_bin.tar.gz -C /usr/local/java/
-    update-alternatives --install "/usr/bin/java" "java" "/usr/local/java/jdk-18.0.1.1/bin/java" 1
-    update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/java/jdk-18.0.1.1/bin/javac" 1
-    update-alternatives --set java /usr/local/java/jdk-18.0.1.1/bin/java
-    update-alternatives --set javac /usr/local/java/jdk-18.0.1.1/bin/javac
-    echo -e ' \n"# Java Configuration\nexport JAVA_HOME=/opt/jdk-18.0.1.1\nexport PATH=$PATH:$HOME/bin:$JAVA_HOME/bin' >> /etc/profile.d/javaenv.sh
-    source /etc/profile.d/javaenv.sh
+    wget https://download.oracle.com/java/18/latest/jdk-18.0.2_linux-x64_bin.tar.gz
+    mkdir /usr/local/java/
+    tar xf jdk-18.0.2_linux-x64_bin.tar.gz -C /usr/local/java/
+    update-alternatives --install "/usr/bin/java" "java" "/usr/local/java/jdk-18.0.2/bin/java" 1
+    update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/java/jdk-18.0.2/bin/javac" 1
+    update-alternatives --set java /usr/local/java/jdk-18.0.2/bin/java
+    update-alternatives --set javac /usr/local/java/jdk-18.0.2/bin/javac
+    echo -e '\n# JAVA Configuration' >>/etc/profile.d/javaenv.sh
+    echo 'JAVA_HOME=/usr/local/java/jdk-18.0.2/bin/java' >>/etc/profile.d/javaenv.sh
+    source $/etc/profile.d/javaenv.sh
     writeInstallationSuccessfulMessage JAVA-JDK-18
 
     writeInstallationMessage JAVA-JDK-17
@@ -218,11 +220,14 @@ for choice in $choices; do
     update-alternatives --install "/usr/bin/java" "java" "/usr/local/java/jdk-17/bin/java" 2
     update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/java/jdk-17/bin/javac" 2
     writeInstallationSuccessfulMessage JAVA-JDK-17
-
+    
+    
     writeInstallationMessage Spring-Boot-CLI
     wget https://repo.spring.io/release/org/springframework/boot/spring-boot-cli/2.7.1/spring-boot-cli-2.7.1-bin.tar.gz
     tar xf spring-boot-cli-2.7.1-bin.tar.gz -C /opt
-    echo -e ' \n# Spring Boot CLI\nexport SPRING_HOME=/opt/spring-2.7.1/\nexport PATH=$PATH:$HOME/bin:$SPRING_HOME/bin' >>/etc/profile.d/springenv.sh
+    echo -e "\n# Spring Boot CLI" >>  /etc/profile.d/springenv.sh
+    echo 'export SPRING_HOME=/opt/spring-2.7.1' >>  /etc/profile.d/springenv.sh
+    echo 'export PATH=$PATH:$HOME/bin:$SPRING_HOME/bin' >>  /etc/profile.d/springenv.sh
     source /etc/profile.d/springenv.sh
     writeInstallationSuccessfulMessage Spring-Boot-CLI
     ;;
@@ -426,7 +431,7 @@ for choice in $choices; do
     dnf -y install libappindicator-gtk3
     ;;
 
-  *) ;;
+  *)
   esac
 done
 
