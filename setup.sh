@@ -66,7 +66,7 @@ dnf install -y \
   zsh \
   dialog \
   gnome-font-viewer \
-  Htop
+  htop
 printf "\n${BLUE}===============Standard packages are installed successfully===============${ENDCOLOR}\n"
 
 cmd=(dialog --title "Fedora 35 Installer" --separate-output --checklist 'Please choose: ' 27 76 16)
